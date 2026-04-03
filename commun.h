@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#define VERSION 2.0 // A mettre à jour à chaque amélioration
+#define VERSION 2.2 // A mettre à jour à chaque amélioration
 
 // éléments de la table config à communiquer
 typedef struct s_config {

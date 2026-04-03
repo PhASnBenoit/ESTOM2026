@@ -92,7 +92,7 @@ void CDatabase::run()
     QSqlDatabase::removeDatabase("CDatabaseConnection");
 }
 
-bool CDatabase::insertDB(const QString &table, const QVariantList &values)
+bool CDatabase::insertDB(const QString &table, const QVariantList values)
 {
     if (values.isEmpty()) {
         qDebug() << "Erreur : aucune valeur fournie pour l'insertion.";
@@ -107,15 +107,24 @@ bool CDatabase::insertDB(const QString &table, const QVariantList &values)
 
     QStringList columns;
     QStringList arg;
+    int etat;
     columns.clear();
     if (table == "BOM") {
-        switch(values.at(1).toInt()) {
-        case 0: arg = {"IPAddr", "Couleur", "Status"}; break;  // BONJOUR
-        case 1: arg = {"IPAddr", "Status"}; break;  // VIDAGE
+        etat = values.at(1).toString().toInt();
+        switch(etat) {
+        case 0:
+            arg = {"IPAddr", "Status", "Couleur"};
+            break;  // BONJOUR
+        case 1:
+            arg = {"IPAddr", "Status"};
+            break;  // VIDAGE
         case 2: // FIN VIDAGE
         case 3: // ANN VIDAGE
-            arg = {"IPAddr", "Status", "Remplissage"}; break;
-        case 4: arg = {"IPAddr", "Status", "NbrCollision"}; break; // CHOC
+            arg = {"IPAddr", "Status", "Remplissage"};
+            break;
+        case 4:
+            arg = {"IPAddr", "Status", "NbrCollision"};
+            break; // CHOC
         } // sw
     } else {   // "PAV"
         arg = {"IPAddr", "Status", "Couleur"};
@@ -216,7 +225,7 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
      toSendLocal.etatP = query.value(0).toString();
   }
   // répondre à BONJOUR du BOM, ordre 0
-  if (toSendLocal.pb == "P" && ordre == 0) {
+  if (toSendLocal.pb == "B" && ordre == 0) {
       req = "SELECT Status, NbrCollision, Remplissage FROM BOM WHERE IPAddr='"+ip+"'";
       if (!query.exec(req)) {
           qDebug() << "Erreur lors de la récupération des IPs:" << query.lastError().text();

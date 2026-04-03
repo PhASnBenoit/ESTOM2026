@@ -73,7 +73,7 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
         switch (infos.status.toInt()) {
         case 0: //BONJOUR
             qDebug() << "BONJOUR de BOM (" << ip << ")";
-            _dbReader->insertDB("BOM", QVariantList{ip, infos.couleur, infos.status});
+            _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.couleur});
             // toSend uniquement pb, le reste dans CApp
             sendMsgTCP(ip, 0, toSend); // Message INIT
             break;
