@@ -19,11 +19,11 @@ void CTcpSender::on_sendMessage(const QString &ip, int ordre, T_SEND toSend)
     case 0: // INIT suite à BONJOUR
         qDebug() << "Ordre0: INIT;";
         if (toSend.pb == "B") {
-            jsonObj["etat"] = toSend.etat;    // TODO ALLER CHERCHER DANS LA BDD LES VALEURS EN COURS
+            jsonObj["etat"] = toSend.etatB;    // TODO ALLER CHERCHER DANS LA BDD LES VALEURS EN COURS
             jsonObj["nbChocs"] = toSend.nbChocs;
             jsonObj["leds"] = toSend.leds;
         } else
-            jsonObj["etat"] = toSend.etat;
+            jsonObj["etat"] = toSend.etatP;
         break;
     case 1:
         qDebug() << "Ordre1: START;";

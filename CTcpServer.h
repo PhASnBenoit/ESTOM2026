@@ -20,7 +20,7 @@ public:
     QTcpSocket* getSocketForIP(const QString &ip) const;
 
 signals:
-    void infoUpdated(T_INFOS infos, QString ip);
+    void sig_infoUpdated(T_INFOS infos, QString ip);
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override;

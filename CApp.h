@@ -39,7 +39,7 @@ private:
     CTcpSender *_tcpSender;
 
 signals:
-    void sendTcpMessageRequested(const QString &ip, int ordre, T_SEND toSend);
+    void sig_sendTcpMessageRequested(const QString &ip, int ordre, T_SEND toSend);
 };
 
 

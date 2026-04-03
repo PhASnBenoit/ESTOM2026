@@ -93,7 +93,7 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor) {
                 } // if senderIp
 
                 // Vers la BDD via CApp
-                emit infoUpdated(infos, senderIP);
+                emit sig_infoUpdated(infos, senderIP);
             } // for
 
             *buffer = messages.last();

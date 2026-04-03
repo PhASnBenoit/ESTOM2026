@@ -84,7 +84,7 @@ void CDatabase::run()
         cfg.status = query.value("Status").toString();
         cfg.luminosite = query.value("Luminosite").toString();
         // synchro WEB --> Serveur TCP
-        emit configUpdated(cfg);
+        emit sig_configUpdated(cfg);
         QThread::sleep(1);  // Pause entre chaque lecture
     } // wh
     // en cas de sortie du thread

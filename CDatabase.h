@@ -29,8 +29,8 @@ private:
     void resetTables(QSqlDatabase &db);
 
 signals:
-    void configUpdated(T_CONFIG cfg);
-    void ipListUpdated(QStringList ipList);
+    void sig_configUpdated(T_CONFIG cfg);
+    void sig_ipListUpdated(QStringList ipList);
 };
 
 #endif // CDBREADER_H
