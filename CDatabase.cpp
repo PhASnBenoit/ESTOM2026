@@ -4,11 +4,11 @@ CDatabase::CDatabase(QObject *parent) : QThread(parent)
 {
     // Connexion temporaire pour reset
     QSqlDatabase resetDb = QSqlDatabase::addDatabase("QMYSQL", "ResetConnection");
-    resetDb.setHostName("localhost");
-    resetDb.setPort(3306);
-    resetDb.setDatabaseName("ESTOM");
-    resetDb.setUserName("SuperViseur");
-    resetDb.setPassword("SuperViseur-estom_2026");
+    resetDb.setHostName(MARIADB_HOST);
+    resetDb.setPort(MARIADB_PORT);
+    resetDb.setDatabaseName(MARIADB_DBNAME);
+    resetDb.setUserName(MARIADB_NAME);
+    resetDb.setPassword(MARIADB_PASSWORD);
 
     if (!resetDb.open()) {
         qDebug() << "Erreur : Impossible d'ouvrir la BDD pour le reset.";
@@ -16,7 +16,7 @@ CDatabase::CDatabase(QObject *parent) : QThread(parent)
     } else {
         qDebug() << "Connexion temporaire pour reset réussie.";
         resetTables(resetDb);
-    }
+    } // else
 
     // Supprimer la connexion temporaire pour éviter les conflits
     resetDb.close();
@@ -54,11 +54,11 @@ void CDatabase::resetTables(QSqlDatabase &db)
 void CDatabase::run()
 {
     threadDb = QSqlDatabase::addDatabase("QMYSQL", "CDatabaseConnection");
-    threadDb.setHostName("localhost");
-    threadDb.setPort(3306);
-    threadDb.setDatabaseName("ESTOM");
-    threadDb.setUserName("SuperViseur");
-    threadDb.setPassword("SuperViseur-estom_2026");
+    threadDb.setHostName(MARIADB_HOST);
+    threadDb.setPort(MARIADB_PORT);
+    threadDb.setDatabaseName(MARIADB_DBNAME);
+    threadDb.setUserName(MARIADB_NAME);
+    threadDb.setPassword(MARIADB_PASSWORD);
     if (!threadDb.open()) {
         qDebug() << "Erreur : Impossible d'ouvrir la base de données depuis le thread.";
         qDebug() << threadDb.lastError().text();
@@ -110,19 +110,12 @@ bool CDatabase::insertDB(const QString &table, const QVariantList &values)
     columns.clear();
     if (table == "BOM") {
         switch(values.at(1).toInt()) {
-        case 0: // BONJOUR
-            arg = {"IPAddr", "Couleur", "Status"};
-        break;
-        case 1: // VIDAGE
-            arg = {"IPAddr", "Status"};
-        break;
+        case 0: arg = {"IPAddr", "Couleur", "Status"}; break;  // BONJOUR
+        case 1: arg = {"IPAddr", "Status"}; break;  // VIDAGE
         case 2: // FIN VIDAGE
         case 3: // ANN VIDAGE
-            arg = {"IPAddr", "Status", "Remplissage"};
-        break;
-        case 4: // CHOC
-            arg = {"IPAddr", "Status", "NbrCollision"};
-        break;
+            arg = {"IPAddr", "Status", "Remplissage"}; break;
+        case 4: arg = {"IPAddr", "Status", "NbrCollision"}; break; // CHOC
         } // sw
     } else {   // "PAV"
         arg = {"IPAddr", "Status", "Couleur"};
@@ -185,25 +178,11 @@ QStringList CDatabase::getAllIPs()
     if (!query.exec("SELECT IPAddr FROM BOM UNION SELECT IPAddr FROM PAV")) {
         qDebug() << "Erreur lors de la récupération des IPs:" << query.lastError().text();
         return ipList;
-    }
+    } // if exec
 
     while (query.next()) {
         ipList.append(query.value(0).toString());
-    }
+    } // wh
 
     return ipList;
-}
-
-QString CDatabase::whoAmI(const QString &ip)
-{
-    QSqlQuery query(threadDb);
-    if (!query.exec("SELECT IPAddr FROM BOM")) {
-        qDebug() << "Erreur lors de verification du type:" << query.lastError().text();
-        return " ";
-    }
-
-    if (ip == query.value("IPAddr").toString())
-        return "B";
-    else
-        return "P";
 }

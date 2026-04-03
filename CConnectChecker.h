@@ -6,6 +6,10 @@
 #include <QStringList>
 #include <QProcess>
 #include <QtConcurrent/QtConcurrent>
+#include <QDebug>
+#include <QSqlError>
+
+#include "commun.h"
 #include "CDatabase.h"
 
 class CConnectChecker : public QThread

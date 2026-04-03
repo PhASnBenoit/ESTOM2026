@@ -13,9 +13,10 @@
 
 class CTcpServer : public QTcpServer {
     Q_OBJECT
+
 public:
     explicit CTcpServer(QObject *parent = nullptr);
-    void startServer(quint16 port = 5005);
+    void startServer(quint16 port = TCP_PORT);
     QTcpSocket* getSocketForIP(const QString &ip) const;
 
 signals:
@@ -23,6 +24,7 @@ signals:
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
+
 private:
     QMap<QString, QTcpSocket*> socketMap;
 };

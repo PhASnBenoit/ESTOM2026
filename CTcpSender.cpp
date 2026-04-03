@@ -3,7 +3,7 @@
 
 CTcpSender::CTcpSender(CTcpServer *tcpServer, QObject *parent) : QObject(parent), _tcpServer(tcpServer) {}
 
-void CTcpSender::sendMessage(const QString &ip, int ordre, QString bp)
+void CTcpSender::on_sendMessage(const QString &ip, int ordre, QString bp)
 {
     qDebug() << "<=====|TCP-SENDER-" << ip <<"|=====>";
     QTcpSocket *socket = _tcpServer->getSocketForIP(ip);
@@ -11,7 +11,7 @@ void CTcpSender::sendMessage(const QString &ip, int ordre, QString bp)
     if (!socket || socket->state() != QAbstractSocket::ConnectedState) {
         qWarning() << "Socket non disponible ou déconnecté pour l'IP:" << ip;
         return;
-    }
+    } // if socket
 
     QJsonObject jsonObj;
     jsonObj["ordre"] = ordre;

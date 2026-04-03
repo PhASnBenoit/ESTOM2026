@@ -33,22 +33,14 @@ CApp::~CApp()
 void CApp::onConfigUpdated(T_CONFIG cfg)
 {
     static int _etatPrecedent = -1; //-1 pour garantir un premier envoi
-    this->_etatGeneral = cfg.status;  //0=init/stopped; 1=running; 2=stopping; 3=loading (countdown)
-    this->_options = cfg.options;
-    this->_ptsRecolte = cfg.ptsRecolte;
-    this->_nbrPAV = cfg.nbrPAV;
-    this->_luminosite = cfg.luminosite;
-
-    int currentEtat = _etatGeneral.toInt();
+    int currentEtat = cfg.status.toInt();
     QStringList ipList = _dbReader->getAllIPs();
-    //QString type;
 
     if (currentEtat != _etatPrecedent) {
         for (const QString &ip : ipList) {
-            //type = _dbReader->whoAmI(ip);
             switch (currentEtat) {
             case 0: // attente départ partie
-                // L'ordre 0 répond à la trame bonjour
+                // L'ordre 0 répond seulement à la trame bonjour
                 // sendMsgTCP(ip, 0, type);
                 // qDebug() << "Ordre 0, initialisation....";
                 break;
@@ -74,53 +66,45 @@ void CApp::onConfigUpdated(T_CONFIG cfg)
 
 void CApp::onInfoUpdated(T_INFOS infos, QString ip)
 {
-    _ip = ip;
-    _infos.type = infos.type;
-    _infos.status = infos.status; // état du périph
-    _infos.couleur = infos.couleur; //
-    _infos.nbCollisions = infos.nbCollisions;
-    _infos.ipPAV = infos.ipPAV;
-    //_progression = progression; // Correspond à leds du BOM
-
-    qDebug() << "<=====|MAJ-INFO-" << _ip <<"|=====>";
+    qDebug() << "<=====|MAJ-INFO-" << ip <<"|=====>";
 
     // états des périphériques BOM ou PAV
-    if (_infos.type == "BOM") {
-        switch (_infos.status.toInt()) {
+    if (infos.type == "BOM") {
+        switch (infos.status.toInt()) {
         case 0: //BONJOUR
-            _dbReader->insertDB("BOM", QVariantList{_ip, _infos.couleur, _infos.status});
-            qDebug() << "BONJOUR de BOM (" << _ip << ")";
+            _dbReader->insertDB("BOM", QVariantList{ip, infos.couleur, infos.status});
+            qDebug() << "BONJOUR de BOM (" << ip << ")";
             // TODO Récupérer BDD et Envoyer INIT au BOM
             break;
         case 1: //EMPTYING
-            _dbReader->insertDB("BOM", QVariantList{_ip, _infos.status});
-            qDebug() << "Remplissage en cours de BOM (" << _ip << ") qui vide PAV (" << _ipPAV << ")";
-            sendMsgTCP(_ipPAV, 11, "B");
+            _dbReader->insertDB("BOM", QVariantList{ip, infos.status});
+            qDebug() << "Remplissage en cours de BOM (" << ip << ") qui vide PAV (" << infos.ipPAV << ")";
+            sendMsgTCP(infos.ipPAV, 11, "B");
             break;
         case 2: //EMPTY
-            _dbReader->insertDB("BOM", QVariantList{_ip, _infos.status, _infos.leds});
-            sendMsgTCP(_ipPAV, 12, "B");
+            _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.leds});
+            sendMsgTCP(infos.ipPAV, 12, "B");
             break;
         case 3: //CANCEL
-            _dbReader->insertDB("BOM", QVariantList{ _ip, _infos.status, _infos.leds});
-            sendMsgTCP(_ipPAV, 13, "B");
+            _dbReader->insertDB("BOM", QVariantList{ ip, infos.status, infos.leds});
+            sendMsgTCP(infos.ipPAV, 13, "B");
             break;
         case 4:  //CHOC
-            _dbReader->insertDB("BOM", QVariantList{_ip, _infos.status, _infos.nbCollisions});
+            _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.nbCollisions});
             break;
         default:
-            qDebug() << "Status BOM inconnu :" << _state;
+            qDebug() << "Status BOM inconnu :" << infos.status;
             break;
         } // sw
     } // if BOM
 
-    if (_infos.type == "PAV") {
+    if (infos.type == "PAV") {
         // une seule trame possible
-        if (_infos.status.toInt() == 0) {  // BONJOUR
-            _dbReader->insertDB("PAV", QVariantList{_ip, _infos.status, _infos.couleur});
+        if (infos.status.toInt() == 0) {  // BONJOUR
+            _dbReader->insertDB("PAV", QVariantList{ip, infos.status, infos.couleur});
             // TODO Récupérer BDD et émettre trame INIT
         } else
-            qDebug() << "Status BOM inconnu :" << _state;
+            qDebug() << "Status BOM inconnu :" << infos.status;
     } // if PAV
 }
 
@@ -135,7 +119,7 @@ void CApp::init() {
 
     // Connexion du signal de démarrage
     connect(_tcpThread, &QThread::started, [=]() {
-        _tcpServer->startServer(5005);
+        _tcpServer->startServer(TCP_PORT);
     });
 
     connect(_tcpServer, &CTcpServer::infoUpdated, this, &CApp::onInfoUpdated);
@@ -146,9 +130,7 @@ void CApp::init() {
     _tcpSender = new CTcpSender(_tcpServer);
     _tcpSender->moveToThread(_tcpThread);
     // connecte
-    connect(this, &CApp::sendTcpMessageRequested, _tcpSender, &CTcpSender::sendMessage);
-
-
+    connect(this, &CApp::sendTcpMessageRequested, _tcpSender, &CTcpSender::on_sendMessage);
     // Connexion pour les mises à jour de configuration
     connect(_dbReader, &CDatabase::configUpdated, this, &CApp::onConfigUpdated);
     _dbReader->start();

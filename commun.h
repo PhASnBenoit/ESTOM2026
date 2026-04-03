@@ -3,6 +3,7 @@
 
 #include <QString>
 
+// éléments de la table config à communiquer
 typedef struct s_config {
     QString options,
             ptsRecolte,
@@ -11,6 +12,7 @@ typedef struct s_config {
             luminosite;
 } T_CONFIG;
 
+// éléments de la communication venant d'un périphérique
 typedef struct s_info {
     QString status,
             type,
@@ -20,4 +22,25 @@ typedef struct s_info {
             leds;
 } T_INFOS;
 
+// éléments utiles pour émettre vers les périphériques
+typedef struct s_send {
+    QString pb,  // "P" pour PAV   "B" pour BOM
+            etat,  // état du périphérique
+            nbChocs,
+            leds,  // progression du véhicule
+            luminosite; // O faible, 1 moyen, 2 fort
+} T_SEND;
+
+#define TCP_PORT         5005
+#define MARIADB_HOST     "localhost"
+#define MARIADB_PORT     3306
+#define MARIADB_DBNAME   "ESTOM"
+#define MARIADB_NAME     "SuperViseur"
+#define MARIADB_PASSWORD "SuperViseur-estom_2026"
+
 #endif // COMMUN_H
+/*
+ * A FAIRE
+ *
+ * - Mettre à jour les données à transmettre dans le trame INIT et DEPART COURSE
+ */

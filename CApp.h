@@ -18,6 +18,7 @@ class CApp : public QObject
 public:
     CApp(QObject *parent = nullptr);
     ~CApp();
+
 private slots:
     void onConfigUpdated(T_CONFIG cfg);
     void onInfoUpdated(T_INFOS infos, QString ip);
@@ -28,31 +29,10 @@ private:
     QThread *_connectThread;
     CConnectChecker *_connectChecker;
     QThread *_tcpThread;
-
     CTcpServer *_tcpServer;
     CTcpSender *_tcpSender;
     void sendMsgTCP(const QString &ip, int ordre, const QString &extraData ="");
 
-    //Config variable
-    QString _options;
-    QString _ptsRecolte;
-    QString _nbrPAV;
-    QString _etatGeneral;
-    QString _luminosite;
-
-    //Info variable
-    QString _ip; // IP du périph envoyant un état
-    T_INFOS _infos;
-    QString _stockage;
-    QString _state;
-    QString _couleur;
-    QString _progression;
-    QString _nbrCollision;
-    QString _ipPAV;
-
-    QString _connected;
-
-    bool _messageEnvoye = false;
 signals:
     void sendTcpMessageRequested(const QString &ip, int ordre, const QString &extraData ="");
 };

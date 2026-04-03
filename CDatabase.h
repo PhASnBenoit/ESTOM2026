@@ -16,12 +16,9 @@ class CDatabase : public QThread
 public:
     explicit CDatabase(QObject *parent = nullptr);
     ~CDatabase();
-
     bool insertDB(const QString &table, const QVariantList &values);
     bool checkPAV(const QString &ipPAV);
-
     QStringList getAllIPs();
-    QString whoAmI(const QString &ip);
 
 protected:
     void run() override;  // Méthode exécutée en boucle dans le thread
@@ -29,6 +26,7 @@ protected:
 private:
     QSqlDatabase threadDb;
     void resetTables(QSqlDatabase &db);
+
 signals:
     void configUpdated(T_CONFIG cfg);
     void ipListUpdated(QStringList ipList);
