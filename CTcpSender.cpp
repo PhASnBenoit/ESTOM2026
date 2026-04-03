@@ -1,9 +1,11 @@
 // CTcpSender.cpp
 #include "CTcpSender.h"
 
-CTcpSender::CTcpSender(CTcpServer *tcpServer, QObject *parent) : QObject(parent), _tcpServer(tcpServer) {}
+CTcpSender::CTcpSender(CTcpServer *tcpServer, QObject *parent) : QObject(parent), _tcpServer(tcpServer) {
+    // nada !
+}
 
-void CTcpSender::on_sendMessage(const QString &ip, int ordre, T_SEND toSend)
+void CTcpSender::on_sendTcpMessage(const QString &ip, int ordre, T_SEND toSend)
 {
     qDebug() << "<=====|TCP-SENDER-" << ip <<"|=====>";
     QTcpSocket *socket = _tcpServer->getSocketForIP(ip);
@@ -27,7 +29,6 @@ void CTcpSender::on_sendMessage(const QString &ip, int ordre, T_SEND toSend)
         break;
     case 1:
         qDebug() << "Ordre1: START;";
-        // TODO ajout luminosite
         jsonObj["luminosite"] = toSend.luminosite;
         break;
     case 2: qDebug() << "Ordre2: STOP;";  break;

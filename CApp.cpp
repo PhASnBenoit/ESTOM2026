@@ -27,7 +27,7 @@ CApp::~CApp()
     delete _connectChecker;
 }
 
-void CApp::onConfigUpdated(T_CONFIG cfg)
+void CApp::on_configUpdated(T_CONFIG cfg)
 {
     static int _etatPrecedent = -1; //-1 pour garantir un premier envoi
     int currentEtat = cfg.status.toInt();
@@ -61,8 +61,8 @@ void CApp::onConfigUpdated(T_CONFIG cfg)
     } // if
 } // method
 
-
-void CApp::onInfoUpdated(T_INFOS infos, QString ip)
+// Appelé lors de la réception d'un état d'un périphérique
+void CApp::on_infoUpdated(T_INFOS infos, QString ip)
 {
     qDebug() << "<=====|MAJ-INFO-" << ip <<"|=====>";
 
@@ -74,7 +74,8 @@ void CApp::onInfoUpdated(T_INFOS infos, QString ip)
         case 0: //BONJOUR
             qDebug() << "BONJOUR de BOM (" << ip << ")";
             _dbReader->insertDB("BOM", QVariantList{ip, infos.couleur, infos.status});
-            sendMsgTCP(ip, 1, toSend);
+            // toSend uniquement pb, le reste dans CApp
+            sendMsgTCP(ip, 1, toSend); // Message INIT
             break;
         case 1: //EMPTYING
             _dbReader->insertDB("BOM", QVariantList{ip, infos.status});
@@ -123,7 +124,7 @@ void CApp::init() {
         _tcpServer->startServer(TCP_PORT);
     });
 
-    connect(_tcpServer, &CTcpServer::sig_infoUpdated, this, &CApp::onInfoUpdated);
+    connect(_tcpServer, &CTcpServer::sig_infoUpdated, this, &CApp::on_infoUpdated);
     // Nettoyage du thread quand il se termine
     connect(_tcpThread, &QThread::finished, _tcpServer, &QObject::deleteLater);
     _tcpThread->start();
@@ -131,9 +132,9 @@ void CApp::init() {
     _tcpSender = new CTcpSender(_tcpServer);
     _tcpSender->moveToThread(_tcpThread);
     // connecte
-    connect(this, &CApp::sig_sendTcpMessageRequested, _tcpSender, &CTcpSender::on_sendMessage);
+    connect(this, &CApp::sig_sendTcpMessage, _tcpSender, &CTcpSender::on_sendTcpMessage);
     // Connexion pour les mises à jour de configuration
-    connect(_dbReader, &CDatabase::sig_configUpdated, this, &CApp::onConfigUpdated);
+    connect(_dbReader, &CDatabase::sig_configUpdated, this, &CApp::on_configUpdated);
     _dbReader->start();
 
     _connectChecker = new CConnectChecker(_dbReader);
@@ -142,9 +143,8 @@ void CApp::init() {
 
 void CApp::sendMsgTCP(const QString &ip, int ordre, T_SEND toSend)
 {
-    // TODO récupérer dans la BDD les informations à envoyer
-    QString pb = toSend.pb;
-    toSend = _dbReader->getDataToSend();
-    toSend.pb = pb;
-    emit sig_sendTcpMessageRequested(ip, ordre, toSend);
+    // Récupérer l'état en cours du PAV
+    // Récupérer les données du BOM
+    toSend = _dbReader->getDatasToSend(ip, ordre, toSend); // TODO méthode à terminer de coder.
+    emit sig_sendTcpMessage(ip, ordre, toSend);
 }

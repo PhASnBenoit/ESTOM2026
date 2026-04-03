@@ -23,14 +23,14 @@ public:
     ~CApp();
 
 private slots:
-    void onConfigUpdated(T_CONFIG cfg);
-    void onInfoUpdated(T_INFOS infos, QString ip);
+    void on_configUpdated(T_CONFIG cfg);
+    void on_infoUpdated(T_INFOS infos, QString ip);
 
 private:
     void init();
     void sendMsgTCP(const QString &ip, int ordre, T_SEND toSend);
 
-    int _luminosite; // PhA à vérifier utilité
+    int _luminosite; // PhA TODO à vérifier utilité
     CDatabase *_dbReader;
     QThread *_connectThread;
     CConnectChecker *_connectChecker;
@@ -39,7 +39,7 @@ private:
     CTcpSender *_tcpSender;
 
 signals:
-    void sig_sendTcpMessageRequested(const QString &ip, int ordre, T_SEND toSend);
+    void sig_sendTcpMessage(const QString &ip, int ordre, T_SEND toSend);
 };
 
 

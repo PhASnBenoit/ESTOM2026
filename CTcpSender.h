@@ -18,7 +18,7 @@ class CTcpSender : public QObject
 
 public:
     explicit CTcpSender(CTcpServer *tcpServer, QObject *parent = nullptr);
-    void on_sendMessage(const QString &ip, int ordre, T_SEND toSend);
+    void on_sendTcpMessage(const QString &ip, int ordre, T_SEND toSend);
 
 private:
     CTcpServer *_tcpServer = nullptr;
