@@ -133,6 +133,7 @@ bool CDatabase::insertDB(const QString &table, const QVariantList &values)
     for (const QString &col : columns) {
         if (col != "IPAddr") { // Ne pas mettre à jour l'IPAddr car c'est la clé
             updateClauses.append(QString("%1 = VALUES(%1)").arg(col));
+            qDebug() << col;
         } // if
     } // for col
 
@@ -161,6 +162,7 @@ bool CDatabase::insertDB(const QString &table, const QVariantList &values)
     query.prepare(queryString);
     for (const QVariant &value : values) {
         query.addBindValue(value);
+        qDebug() << value;
     } // for
     if (!query.exec()) {
         qDebug() << "Erreur lors de l'insertion :" << query.lastError().text();

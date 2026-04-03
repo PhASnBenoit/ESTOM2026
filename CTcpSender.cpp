@@ -16,7 +16,7 @@ void CTcpSender::on_sendTcpMessage(const QString &ip, int ordre, T_SEND toSend)
     } // if socket
 
     QJsonObject jsonObj;
-    jsonObj["ordre"] = ordre;
+    jsonObj["ordre"] = QString::number(ordre);
     switch(ordre) {
     case 0: // INIT suite à BONJOUR
         qDebug() << "Ordre0: INIT;";

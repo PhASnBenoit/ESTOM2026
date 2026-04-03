@@ -75,7 +75,7 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
             qDebug() << "BONJOUR de BOM (" << ip << ")";
             _dbReader->insertDB("BOM", QVariantList{ip, infos.couleur, infos.status});
             // toSend uniquement pb, le reste dans CApp
-            sendMsgTCP(ip, 1, toSend); // Message INIT
+            sendMsgTCP(ip, 0, toSend); // Message INIT
             break;
         case 1: //EMPTYING
             _dbReader->insertDB("BOM", QVariantList{ip, infos.status});
@@ -104,7 +104,7 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
         // une seule trame possible
         if (infos.status.toInt() == 0) {  // BONJOUR
             _dbReader->insertDB("PAV", QVariantList{ip, infos.status, infos.couleur});
-            sendMsgTCP(ip, 1, toSend);
+            sendMsgTCP(ip, 0, toSend);
         } else
             qDebug() << "Status BOM inconnu :" << infos.status;
     } // if PAV
