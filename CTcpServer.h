@@ -1,7 +1,5 @@
 // CTcpServer.h
-
-#ifndef CTCP_SERVER_H
-#define CTCP_SERVER_H
+#pragma once
 
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -28,5 +26,3 @@ protected:
 private:
     QMap<QString, QTcpSocket*> socketMap;
 };
-
-#endif // CTCP_SERVER_H

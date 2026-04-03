@@ -1,5 +1,5 @@
-#ifndef CAPP_H
-#define CAPP_H
+// CApp.h
+#pragma once // Directive d'inclusion exclusive, plus moderne !
 
 #include <QObject>
 #include <QDebug>
@@ -41,6 +41,3 @@ private:
 signals:
     void sig_sendTcpMessage(const QString &ip, int ordre, T_SEND toSend);
 };
-
-
-#endif // CAPP_H

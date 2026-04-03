@@ -1,5 +1,5 @@
-#ifndef CCONNECTCHECKER_H
-#define CCONNECTCHECKER_H
+// CConnectChecker.h
+#pragma once
 
 #include <QObject>
 #include <QThread>
@@ -35,5 +35,3 @@ private:
     void updateConnectStatus(const QString &ip, int status);
     
 };
-
-#endif // CCONNECTCHECKER_H

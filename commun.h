@@ -1,7 +1,9 @@
-#ifndef COMMUN_H
-#define COMMUN_H
+// commun.h
+#pragma once
 
 #include <QString>
+
+#define VERSION 2.0 // A mettre à jour à chaque amélioration
 
 // éléments de la table config à communiquer
 typedef struct s_config {
@@ -38,10 +40,3 @@ typedef struct s_send {
 #define MARIADB_DBNAME   "ESTOM"
 #define MARIADB_NAME     "SuperViseur"
 #define MARIADB_PASSWORD "SuperViseur-estom_2026"
-
-#endif // COMMUN_H
-/*
- * A FAIRE
- *
- * CDatabase::getDataToSend à terminer
- */

@@ -1,5 +1,5 @@
-#ifndef CDATABASE_H
-#define CDATABASE_H
+// CDatabase.h
+#pragma once
 
 #include <QThread>
 #include <QSqlDatabase>
@@ -30,7 +30,5 @@ private:
 
 signals:
     void sig_configUpdated(T_CONFIG cfg);
-    void sig_ipListUpdated(QStringList ipList);
+    //void sig_ipListUpdated(QStringList ipList);
 };
-
-#endif // CDBREADER_H
