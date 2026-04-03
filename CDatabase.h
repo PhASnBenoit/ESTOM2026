@@ -19,6 +19,7 @@ public:
     bool insertDB(const QString &table, const QVariantList &values);
     bool checkPAV(const QString &ipPAV);
     QStringList getAllIPs();
+    T_SEND getDataToSend();
 
 protected:
     void run() override;  // Méthode exécutée en boucle dans le thread

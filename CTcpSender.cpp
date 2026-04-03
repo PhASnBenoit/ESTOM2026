@@ -3,7 +3,7 @@
 
 CTcpSender::CTcpSender(CTcpServer *tcpServer, QObject *parent) : QObject(parent), _tcpServer(tcpServer) {}
 
-void CTcpSender::on_sendMessage(const QString &ip, int ordre, QString bp)
+void CTcpSender::on_sendMessage(const QString &ip, int ordre, T_SEND toSend)
 {
     qDebug() << "<=====|TCP-SENDER-" << ip <<"|=====>";
     QTcpSocket *socket = _tcpServer->getSocketForIP(ip);
@@ -18,14 +18,18 @@ void CTcpSender::on_sendMessage(const QString &ip, int ordre, QString bp)
     switch(ordre) {
     case 0: // INIT suite à BONJOUR
         qDebug() << "Ordre0: INIT;";
-        if (bp == "B") {
-            jsonObj["etatV"] = 0;    // TODO ALLER CHERCHER DANS LA BDD LES VALEURS EN COURS
-            jsonObj["nbChocs"] = 0;
-            jsonObj["leds"] = 0;
+        if (toSend.pb == "B") {
+            jsonObj["etat"] = toSend.etat;    // TODO ALLER CHERCHER DANS LA BDD LES VALEURS EN COURS
+            jsonObj["nbChocs"] = toSend.nbChocs;
+            jsonObj["leds"] = toSend.leds;
         } else
-            jsonObj["etat"] = 0;
+            jsonObj["etat"] = toSend.etat;
         break;
-    case 1: qDebug() << "Ordre1: START;"; break;
+    case 1:
+        qDebug() << "Ordre1: START;";
+        // TODO ajout luminosite
+        jsonObj["luminosite"] = toSend.luminosite;
+        break;
     case 2: qDebug() << "Ordre2: STOP;";  break;
     case 11: qDebug() << "Ordre11; EMPTYING;"; break;
     case 12: qDebug() << "Ordre12: EMPTY;"; break;

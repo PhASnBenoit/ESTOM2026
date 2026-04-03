@@ -25,7 +25,8 @@ typedef struct s_info {
 // éléments utiles pour émettre vers les périphériques
 typedef struct s_send {
     QString pb,  // "P" pour PAV   "B" pour BOM
-            etat,  // état du périphérique
+            etatB,  // état du périphérique BOM
+            etatP,  // état du périph PAV
             nbChocs,
             leds,  // progression du véhicule
             luminosite; // O faible, 1 moyen, 2 fort
@@ -42,5 +43,5 @@ typedef struct s_send {
 /*
  * A FAIRE
  *
- * - Mettre à jour les données à transmettre dans le trame INIT et DEPART COURSE
+ * CDatabase::getDataToSend à terminer
  */

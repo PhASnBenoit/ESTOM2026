@@ -186,3 +186,28 @@ QStringList CDatabase::getAllIPs()
 
     return ipList;
 }
+
+T_SEND CDatabase::getDataToSend()
+{
+  T_SEND toSend;
+/*  QSqlQuery query(threadDb);
+  QString req;
+  req = "SELECT BOM.Status, PAV.Status, NbrCollision, Remplissage, Luminosite ";
+  req+= "FROM Config, BOM, PAV ";
+  req+= "WHERE IPAddr = ";
+
+  if (!query.exec(req)) {
+      qDebug() << "Erreur lors de la récupération des IPs:" << query.lastError().text();
+      return ipList;
+  } // if exec
+
+  query.next();
+  toSend.etatB = query.value(0).toString();
+  toSend.etatP = query.value(1).toString();
+  toSend.etatB = query.value(2).toString();
+  toSend.etatB = query.value(3).toString();
+  toSend.etatB = query.value(4).toString();
+  */
+  return toSend;
+
+}

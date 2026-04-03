@@ -1,6 +1,3 @@
-#include <QTcpSocket>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include "CApp.h"
 
 CApp::CApp(QObject *parent)
@@ -35,6 +32,7 @@ void CApp::onConfigUpdated(T_CONFIG cfg)
     static int _etatPrecedent = -1; //-1 pour garantir un premier envoi
     int currentEtat = cfg.status.toInt();
     QStringList ipList = _dbReader->getAllIPs();
+    T_SEND toSend;
 
     if (currentEtat != _etatPrecedent) {
         for (const QString &ip : ipList) {
@@ -45,11 +43,11 @@ void CApp::onConfigUpdated(T_CONFIG cfg)
                 // qDebug() << "Ordre 0, initialisation....";
                 break;
             case 1: // départ partie
-                sendMsgTCP(ip, 1);
+                sendMsgTCP(ip, 1, toSend);
                 qDebug() << "Ordre 1, début de partie....";
                 break;
             case 2:  // fin de la partie (podium)
-                sendMsgTCP(ip, 2);
+                sendMsgTCP(ip, 2, toSend);
                 qDebug() << "Ordre 2, fin de la partie....";
                 break;
             case 3: // compte à rebour début partie
@@ -68,26 +66,28 @@ void CApp::onInfoUpdated(T_INFOS infos, QString ip)
 {
     qDebug() << "<=====|MAJ-INFO-" << ip <<"|=====>";
 
+    T_SEND toSend;
     // états des périphériques BOM ou PAV
     if (infos.type == "BOM") {
+        toSend.pb = "B";
         switch (infos.status.toInt()) {
         case 0: //BONJOUR
-            _dbReader->insertDB("BOM", QVariantList{ip, infos.couleur, infos.status});
             qDebug() << "BONJOUR de BOM (" << ip << ")";
-            // TODO Récupérer BDD et Envoyer INIT au BOM
+            _dbReader->insertDB("BOM", QVariantList{ip, infos.couleur, infos.status});
+            sendMsgTCP(ip, 1, toSend);
             break;
         case 1: //EMPTYING
             _dbReader->insertDB("BOM", QVariantList{ip, infos.status});
             qDebug() << "Remplissage en cours de BOM (" << ip << ") qui vide PAV (" << infos.ipPAV << ")";
-            sendMsgTCP(infos.ipPAV, 11, "B");
+            sendMsgTCP(infos.ipPAV, 11, toSend);
             break;
         case 2: //EMPTY
             _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.leds});
-            sendMsgTCP(infos.ipPAV, 12, "B");
+            sendMsgTCP(infos.ipPAV, 12, toSend);
             break;
         case 3: //CANCEL
             _dbReader->insertDB("BOM", QVariantList{ ip, infos.status, infos.leds});
-            sendMsgTCP(infos.ipPAV, 13, "B");
+            sendMsgTCP(infos.ipPAV, 13, toSend);
             break;
         case 4:  //CHOC
             _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.nbCollisions});
@@ -99,10 +99,11 @@ void CApp::onInfoUpdated(T_INFOS infos, QString ip)
     } // if BOM
 
     if (infos.type == "PAV") {
+        toSend.pb = "P";
         // une seule trame possible
         if (infos.status.toInt() == 0) {  // BONJOUR
             _dbReader->insertDB("PAV", QVariantList{ip, infos.status, infos.couleur});
-            // TODO Récupérer BDD et émettre trame INIT
+            sendMsgTCP(ip, 1, toSend);
         } else
             qDebug() << "Status BOM inconnu :" << infos.status;
     } // if PAV
@@ -139,7 +140,11 @@ void CApp::init() {
     _connectChecker->start();
 }
 
-void CApp::sendMsgTCP(const QString &ip, int ordre, const QString &extraData)
+void CApp::sendMsgTCP(const QString &ip, int ordre, T_SEND toSend)
 {
-    emit sendTcpMessageRequested(ip, ordre, extraData);
+    // TODO récupérer dans la BDD les informations à envoyer
+    QString pb = toSend.pb;
+    toSend = _dbReader->getDataToSend();
+    toSend.pb = pb;
+    emit sendTcpMessageRequested(ip, ordre, toSend);
 }

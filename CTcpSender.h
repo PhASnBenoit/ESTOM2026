@@ -2,13 +2,15 @@
 #pragma once
 
 #include <QTcpSocket>
-#include "CTcpServer.h"
 #include <QObject>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QHostAddress>
 #include <QDebug>
+
+#include "CTcpServer.h"
 #include "CDatabase.h"
+#include "commun.h"
 
 class CTcpSender : public QObject
 {
@@ -16,7 +18,7 @@ class CTcpSender : public QObject
 
 public:
     explicit CTcpSender(CTcpServer *tcpServer, QObject *parent = nullptr);
-    void on_sendMessage(const QString &ip, int ordre, QString bp);
+    void on_sendMessage(const QString &ip, int ordre, T_SEND toSend);
 
 private:
     CTcpServer *_tcpServer = nullptr;

@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QDebug>
 #include <QThread>
+#include <QTcpSocket>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 #include "CDatabase.h"
 #include "CTcpServer.h"
@@ -25,16 +28,18 @@ private slots:
 
 private:
     void init();
+    void sendMsgTCP(const QString &ip, int ordre, T_SEND toSend);
+
+    int _luminosite; // PhA à vérifier utilité
     CDatabase *_dbReader;
     QThread *_connectThread;
     CConnectChecker *_connectChecker;
     QThread *_tcpThread;
     CTcpServer *_tcpServer;
     CTcpSender *_tcpSender;
-    void sendMsgTCP(const QString &ip, int ordre, const QString &extraData ="");
 
 signals:
-    void sendTcpMessageRequested(const QString &ip, int ordre, const QString &extraData ="");
+    void sendTcpMessageRequested(const QString &ip, int ordre, T_SEND toSend);
 };
 
 
