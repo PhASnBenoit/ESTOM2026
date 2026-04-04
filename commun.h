@@ -3,7 +3,8 @@
 
 #include <QString>
 
-#define VERSION 2.2 // A mettre à jour à chaque amélioration
+// A mettre à jour à chaque amélioration
+#define VERSION 2.3 // Correction état 2 et 3, ajout PREFIXE_IP
 
 // éléments de la table config à communiquer
 typedef struct s_config {
@@ -35,6 +36,7 @@ typedef struct s_send {
 } T_SEND;
 
 #define TCP_PORT         5005
+#define PREFIXE_IP       "192.168.0."  // TODO A CHANGER SI NECESSAIRE
 #define MARIADB_HOST     "localhost"
 #define MARIADB_PORT     3306
 #define MARIADB_DBNAME   "ESTOM"

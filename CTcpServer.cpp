@@ -72,13 +72,11 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor) {
                     infos.couleur = jsonObj.value("couleur").toString();
                     break;
                 case 1: // BOM annonce DEB TRANSFER
-                    infos.ipPAV = jsonObj.value("ipPAV").toString();
+                    infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
                     break;
                 case 2: // BOM annonce FIN TRANSFER
-                    infos.ipPAV = jsonObj.value("ipPAV").toString();
-                    break;
                 case 3: // BOM annonce ANN TRANSFER
-                    infos.ipPAV = jsonObj.value("ipPAV").toString();
+                    infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
                     infos.leds = jsonObj.value("leds").toString();
                     break;
                 case 4: // BOM annonce CHOCS
@@ -98,7 +96,6 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor) {
 
             *buffer = messages.last();
         });
-
         connect(clientSocket, &QTcpSocket::disconnected, clientSocket, &QTcpSocket::deleteLater);
     }, Qt::QueuedConnection);
 }

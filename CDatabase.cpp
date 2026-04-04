@@ -206,14 +206,15 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
   QString req;
 
   // récupération de la luminosite dans tous les cas
-  req = "SELECT Luminosite FROM Config LIMIT 1";
+  req = "SELECT Luminosite, Status FROM Config LIMIT 1";
   if (!query.exec(req)) {
       qDebug() << "Erreur lors de la récupération des IPs:" << query.lastError().text();
       return toSendLocal;
   } // if exec
   query.next();
   toSendLocal.luminosite = query.value(0).toString();
-
+  toSendLocal.etatP = toSendLocal.etatB = query.value(1).toString();
+/*
   // répondre à BONJOUR du PAV, ordre 0
   if (toSendLocal.pb == "P" && ordre == 0) {
      req = "SELECT Status FROM PAV WHERE IPAddr='"+ip+"'";
@@ -223,18 +224,18 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
      } // if exec
      query.next();
      toSendLocal.etatP = query.value(0).toString();
-  }
+  }*/
   // répondre à BONJOUR du BOM, ordre 0
   if (toSendLocal.pb == "B" && ordre == 0) {
-      req = "SELECT Status, NbrCollision, Remplissage FROM BOM WHERE IPAddr='"+ip+"'";
+      req = "SELECT NbrCollision, Remplissage FROM BOM WHERE IPAddr='"+ip+"'";
       if (!query.exec(req)) {
           qDebug() << "Erreur lors de la récupération des IPs:" << query.lastError().text();
           return toSendLocal;
       } // if exec
       query.next();
-      toSendLocal.etatB = query.value(0).toString();
-      toSendLocal.nbChocs = query.value(1).toString();
-      toSendLocal.leds = query.value(2).toString();
+    //  toSendLocal.etatB = query.value(0).toString(); // STATUS DU JEU !!!
+      toSendLocal.nbChocs = query.value(0).toString();
+      toSendLocal.leds = query.value(1).toString();
   } // if P 0
   return toSendLocal;
 }
