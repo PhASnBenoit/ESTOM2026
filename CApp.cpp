@@ -30,17 +30,16 @@ CApp::~CApp()
 void CApp::on_configUpdated(T_CONFIG cfg)
 {
     static int _etatPrecedent = -1; //-1 pour garantir un premier envoi
-    int currentEtat = cfg.status.toInt();
+    _currentEtat = cfg.status.toInt();
     QStringList ipList = _dbReader->getAllIPs();
     T_SEND toSend;
 
-    if (currentEtat != _etatPrecedent) {
+    if (_currentEtat != _etatPrecedent) {
         for (const QString &ip : ipList) {
-            switch (currentEtat) {
+            switch (_currentEtat) {
             case 0: // attente départ partie
-                // L'ordre 0 répond seulement à la trame bonjour
-                // sendMsgTCP(ip, 0, type);
-                // qDebug() << "Ordre 0, initialisation....";
+                sendMsgTCP(ip, 0, toSend);
+                qDebug() << "Ordre 0, initialisation....";
                 break;
             case 1: // départ partie
                 sendMsgTCP(ip, 1, toSend);
@@ -57,7 +56,7 @@ void CApp::on_configUpdated(T_CONFIG cfg)
                 break;
             } //sw
         } // for
-        _etatPrecedent = currentEtat;
+        _etatPrecedent = _currentEtat;
     } // if
 } // method
 
@@ -78,20 +77,28 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
             sendMsgTCP(ip, 0, toSend); // Message INIT
             break;
         case 1: //EMPTYING
-            _dbReader->insertDB("BOM", QVariantList{ip, infos.status});
-            qDebug() << "Remplissage en cours de BOM (" << ip << ") qui vide PAV (" << infos.ipPAV << ")";
-            sendMsgTCP(infos.ipPAV, 11, toSend);
+            if (_currentEtat == 1) {
+                _dbReader->insertDB("BOM", QVariantList{ip, infos.status});
+                qDebug() << "Remplissage en cours de BOM (" << ip << ") qui vide PAV (" << infos.ipPAV << ")";
+                sendMsgTCP(infos.ipPAV, 11, toSend);
+            } // if
             break;
         case 2: //EMPTY
-            _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.leds});
-            sendMsgTCP(infos.ipPAV, 12, toSend);
+            if (_currentEtat == 1) {
+                _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.leds});
+                sendMsgTCP(infos.ipPAV, 12, toSend);
+            } // if 1
             break;
         case 3: //CANCEL
-            _dbReader->insertDB("BOM", QVariantList{ ip, infos.status, infos.leds});
-            sendMsgTCP(infos.ipPAV, 13, toSend);
+            if (_currentEtat == 1) {
+                _dbReader->insertDB("BOM", QVariantList{ ip, infos.status, infos.leds});
+                sendMsgTCP(infos.ipPAV, 13, toSend);
+            } // if 1
             break;
         case 4:  //CHOC
-            _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.nbCollisions});
+            if (_currentEtat == 1) {
+                _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.nbCollisions});
+            } // if 1
             break;
         default:
             qDebug() << "Status BOM inconnu :" << infos.status;

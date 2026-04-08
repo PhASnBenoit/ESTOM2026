@@ -30,7 +30,7 @@ private:
     void init();
     void sendMsgTCP(const QString &ip, int ordre, T_SEND toSend);
 
-    int _luminosite; // PhA TODO à vérifier utilité
+    int _currentEtat;
     CDatabase *_dbReader;
     QThread *_connectThread;
     CConnectChecker *_connectChecker;
