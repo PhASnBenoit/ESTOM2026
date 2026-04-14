@@ -35,6 +35,7 @@ void CApp::on_configUpdated(T_CONFIG cfg)
     T_SEND toSend;
 
     if (_currentEtat != _etatPrecedent) {
+        toSend.etatP = QString::number(_currentEtat);
         for (const QString &ip : ipList) {
             switch (_currentEtat) {
             case 0: // attente départ partie
@@ -97,7 +98,7 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
             break;
         case 4:  //CHOC
             if (_currentEtat == 1) {
-                _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.nbCollisions});
+                _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.collisions});
             } // if 1
             break;
         default:
@@ -150,8 +151,6 @@ void CApp::init() {
 
 void CApp::sendMsgTCP(const QString &ip, int ordre, T_SEND toSend)
 {
-    // Récupérer l'état en cours du PAV
-    // Récupérer les données du BOM
-    toSend = _dbReader->getDatasToSend(ip, ordre, toSend); // TODO méthode à terminer de coder.
+    toSend = _dbReader->getDatasToSend(ip, ordre, toSend);
     emit sig_sendTcpMessage(ip, ordre, toSend);
 }

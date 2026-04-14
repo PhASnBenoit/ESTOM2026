@@ -80,7 +80,7 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor) {
                     infos.leds = jsonObj.value("leds").toString();
                     break;
                 case 4: // BOM annonce CHOCS
-                    infos.nbCollisions = jsonObj.value("nbCollisions").toString();
+                    infos.collisions = jsonObj.value("collisions").toString();
                     break;
                 } // sw
 

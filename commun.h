@@ -5,7 +5,8 @@
 
 // A mettre à jour à chaque amélioration
 //#define VERSION 2.3 // Correction état 2 et 3, ajout PREFIXE_IP
-#define VERSION 2.4 // transmission etat jeu 0 + corrections mineures
+//#define VERSION 2.4 // transmission etat jeu 0 + corrections mineures
+#define VERSION 2.5 // Modification trame INIT
 
 // éléments de la table config à communiquer
 typedef struct s_config {
@@ -21,7 +22,7 @@ typedef struct s_info {
     QString status,
             type,
             couleur,
-            nbCollisions,
+            collisions,
             ipPAV,
             leds;
 } T_INFOS;
@@ -31,8 +32,9 @@ typedef struct s_send {
     QString pb,  // "P" pour PAV   "B" pour BOM
             etatB,  // état du périphérique BOM
             etatP,  // état du périph PAV
-            nbChocs,
-            leds,  // progression du véhicule
+            etatJ,  // état du jeu
+            collisions, // nbre de collisions total du véhicule
+            leds,  // nbre de led allumée
             luminosite; // O faible, 1 moyen, 2 fort
 } T_SEND;
 

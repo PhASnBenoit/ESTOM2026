@@ -156,15 +156,7 @@ bool CDatabase::insertDB(const QString &table, const QVariantList values)
     
     QString ip;
     ip = values[0].toString();
-/*
-    if (table == "PAV" && values.size() > 3) {
-    } else if (table == "BOM" && values.size() > 5) {
-        ip = values[5].toString();
-    } else {
-        ip = "Unknown";
-        qDebug() << "CDatabase::insertDB TABLE inconnue";
-    } // else
-*/
+
     qDebug() << "Commande suite ip :" << ip << " " << queryString;
 
     QSqlQuery query(threadDb);
@@ -202,6 +194,7 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
 {
   T_SEND toSendLocal;
   toSendLocal.pb = toSend.pb;
+  toSendLocal.etatJ = toSend.etatJ;
   QSqlQuery query(threadDb);
   QString req;
 
@@ -213,8 +206,8 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
   } // if exec
   query.next();
   toSendLocal.luminosite = query.value(0).toString();
-  toSendLocal.etatP = toSendLocal.etatB = query.value(1).toString();
-/*
+  toSendLocal.etatB = query.value(1).toString();
+
   // répondre à BONJOUR du PAV, ordre 0
   if (toSendLocal.pb == "P" && ordre == 0) {
      req = "SELECT Status FROM PAV WHERE IPAddr='"+ip+"'";
@@ -224,7 +217,8 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
      } // if exec
      query.next();
      toSendLocal.etatP = query.value(0).toString();
-  }*/
+  } // if répondre INIT
+
   // répondre à BONJOUR du BOM, ordre 0
   if (toSendLocal.pb == "B" && ordre == 0) {
       req = "SELECT NbrCollision, Remplissage FROM BOM WHERE IPAddr='"+ip+"'";
@@ -234,7 +228,7 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
       } // if exec
       query.next();
     //  toSendLocal.etatB = query.value(0).toString(); // STATUS DU JEU !!!
-      toSendLocal.nbChocs = query.value(0).toString();
+      toSendLocal.collisions = query.value(0).toString();
       toSendLocal.leds = query.value(1).toString();
   } // if P 0
   return toSendLocal;

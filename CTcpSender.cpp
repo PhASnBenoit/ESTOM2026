@@ -21,8 +21,8 @@ void CTcpSender::on_sendTcpMessage(const QString &ip, int ordre, T_SEND toSend)
     case 0: // INIT suite à BONJOUR
         qDebug() << "Ordre0: INIT;";
         if (toSend.pb == "B") {
-            jsonObj["etat"] = toSend.etatB;
-            jsonObj["nbChocs"] = toSend.nbChocs;
+            jsonObj["etat"] = toSend.etatJ;
+            jsonObj["collisions"] = toSend.collisions;
             jsonObj["leds"] = toSend.leds;
         } else
             jsonObj["etat"] = toSend.etatP;
