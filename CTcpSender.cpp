@@ -21,11 +21,13 @@ void CTcpSender::on_sendTcpMessage(const QString &ip, int ordre, T_SEND toSend)
     case 0: // INIT suite à BONJOUR
         qDebug() << "Ordre0: INIT;";
         if (toSend.pb == "B") {
-            jsonObj["etat"] = toSend.etatJ;
+            jsonObj["etatJeu"] = toSend.etatJ;
             jsonObj["collisions"] = toSend.collisions;
             jsonObj["leds"] = toSend.leds;
-        } else
+        } else {
             jsonObj["etat"] = toSend.etatP;
+            jsonObj["etatJeu"] = toSend.etatJ;
+        } // else
         break;
     case 1:
         qDebug() << "Ordre1: START;";

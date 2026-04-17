@@ -67,6 +67,7 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
     qDebug() << "<=====|MAJ-INFO-" << ip <<"|=====>";
 
     T_SEND toSend;
+    toSend.etatJ = QString::number(_currentEtat);
     // états des périphériques BOM ou PAV
     if (infos.type == "BOM") {
         toSend.pb = "B";

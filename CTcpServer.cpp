@@ -43,8 +43,8 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor) {
             });
         } // else
 
-        QByteArray *buffer = new QByteArray;
 
+        QByteArray *buffer = new QByteArray;
         // Message reçu d'un périphérique (PAV, BOM)
         connect(clientSocket, &QTcpSocket::readyRead, this, [=]() {
             buffer->append(clientSocket->readAll());
@@ -81,6 +81,10 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor) {
                     break;
                 case 4: // BOM annonce CHOCS
                     infos.collisions = jsonObj.value("collisions").toString();
+                    break;
+               case 99: // message debug de BOM
+                    qDebug() << jsonObj.value("texte").toString();
+                    continue;
                     break;
                 } // sw
 

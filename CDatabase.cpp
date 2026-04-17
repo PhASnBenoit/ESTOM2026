@@ -47,6 +47,9 @@ void CDatabase::resetTables(QSqlDatabase &db)
             qDebug() << "Erreur lors de la réinitialisation de l'ID de" << table << ":" << query.lastError().text();
         } // if alter
     } // for
+    if (!query.exec("UPDATE Config SET Status = 0")) {
+        qDebug() << "Erreur lors du changement de status de config :" << query.lastError().text();
+    } // if delete
     query.finish();
     qDebug() << "Tables BOM et PAV réinitialisées avec succès.";
 } // method
@@ -227,7 +230,6 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
           return toSendLocal;
       } // if exec
       query.next();
-    //  toSendLocal.etatB = query.value(0).toString(); // STATUS DU JEU !!!
       toSendLocal.collisions = query.value(0).toString();
       toSendLocal.leds = query.value(1).toString();
   } // if P 0
