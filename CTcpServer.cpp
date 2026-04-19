@@ -64,7 +64,6 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor) {
                 QJsonObject jsonObj = doc.object();
                 T_INFOS infos;
                 infos.status = jsonObj.value("status").toString();
-                infos.type = "BOM";  // par défaut
 
                 switch(infos.status.toInt()) {
                 case 0: // BOM ou PAV annonce BONJOUR
@@ -72,16 +71,31 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor) {
                     infos.couleur = jsonObj.value("couleur").toString();
                     break;
                 case 1: // BOM annonce DEB TRANSFER
+                    infos.type = "BOM";
                     infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
                     break;
                 case 2: // BOM annonce FIN TRANSFER
                 case 3: // BOM annonce ANN TRANSFER
+                    infos.type = "BOM";
                     infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
                     infos.leds = jsonObj.value("leds").toString();
                     break;
                 case 4: // BOM annonce CHOCS
+                    infos.type = "BOM";
                     infos.collisions = jsonObj.value("collisions").toString();
                     break;
+                case 20: // PAV VIDE
+                    infos.type = "PAV";
+                    infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
+                    break;
+                case 21: // PAV PLEIN
+                    infos.type = "PAV";
+                    infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
+                     break;
+                case 22: // PAV VIDAGE
+                    infos.type = "PAV";
+                    infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
+                     break;
                case 99: // message debug de BOM
                     qDebug() << jsonObj.value("texte").toString();
                     continue;

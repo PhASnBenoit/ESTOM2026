@@ -95,12 +95,18 @@ void CDatabase::run()
     QSqlDatabase::removeDatabase("CDatabaseConnection");
 }
 
-bool CDatabase::insertDB(const QString &table, const QVariantList values)
+bool CDatabase::insertDB(const QString &table, const QVariantList valuesBP)
 {
-    if (values.isEmpty()) {
+    if (valuesBP.isEmpty()) {
         qDebug() << "Erreur : aucune valeur fournie pour l'insertion.";
-        return false;
-    }
+        return false;    
+    } // if empty
+
+    int etat;
+    etat = valuesBP.at(1).toString().toInt();
+    QVariantList values = valuesBP;
+    if ( (table=="PAV") && (etat==0) )
+        values.removeAt(1); // enleve l'état pour PAV trame BONJOUR
 
     // Construire la liste des placeholders "?" pour la requête préparée
     QStringList placeholders;
@@ -110,10 +116,9 @@ bool CDatabase::insertDB(const QString &table, const QVariantList values)
 
     QStringList columns;
     QStringList arg;
-    int etat;
     columns.clear();
+
     if (table == "BOM") {
-        etat = values.at(1).toString().toInt();
         switch(etat) {
         case 0:
             arg = {"IPAddr", "Status", "Couleur"};
@@ -130,7 +135,17 @@ bool CDatabase::insertDB(const QString &table, const QVariantList values)
             break; // CHOC
         } // sw
     } else {   // "PAV"
-        arg = {"IPAddr", "Status", "Couleur"};
+        switch(etat) {
+        case 0:  // BONJOUR
+            //values.removeAt(1); // enlève le status
+            arg = {"IPAddr", /*"Status", */"Couleur"};
+        break;
+        case 20: // VIDE
+        case 21: // PLEIN
+        case 22: // VIDAGE
+            arg = {"IPAddr", "Status"};
+        break;
+        } // sw
     } // else
     columns.append(arg);
 
@@ -175,6 +190,19 @@ bool CDatabase::insertDB(const QString &table, const QVariantList values)
     return true;
 }
 
+bool CDatabase::checkPAV(const QString &ip)
+{
+    QSqlQuery query(threadDb);
+
+    if (!query.exec("SELECT IPAddr FROM PAV WHERE IPAddr = '"+ip+"'")) {
+        qDebug() << "Erreur checkPAV : " << query.lastError().text();
+        return false;
+    } // if exec
+    if (query.next()) {
+        return true;
+    } // if next
+    return false;
+}
 
 QStringList CDatabase::getAllIPs()
 {
@@ -197,7 +225,6 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
 {
   T_SEND toSendLocal;
   toSendLocal.pb = toSend.pb;
-  toSendLocal.etatJ = toSend.etatJ;
   QSqlQuery query(threadDb);
   QString req;
 
@@ -209,10 +236,10 @@ T_SEND CDatabase::getDatasToSend(QString ip, int ordre, T_SEND toSend)
   } // if exec
   query.next();
   toSendLocal.luminosite = query.value(0).toString();
-  toSendLocal.etatB = query.value(1).toString();
+  toSendLocal.etatJ = query.value(1).toString();
 
   // répondre à BONJOUR du PAV, ordre 0
-  if (toSendLocal.pb == "P" && ordre == 0) {
+  if ( (toSendLocal.pb=="P") && (ordre==0) ) {
      req = "SELECT Status FROM PAV WHERE IPAddr='"+ip+"'";
      if (!query.exec(req)) {
          qDebug() << "Erreur lors de la récupération des IPs:" << query.lastError().text();

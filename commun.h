@@ -11,8 +11,8 @@
 //#define VERSION 2.5 // Modification trame INIT
 //#define VERSION 2.6 // Corrections bugs, modif trame INIT PAV 16/04/2026
 //#define VERSION 2.7 // 16/04/2026 Ajout trame JSON de débug
-#define VERSION 2.8 // 17/04/2026 Initialisation
-
+//#define VERSION 2.8 // 17/04/2026 Initialisation
+#define VERSION 2.9 // 19/04/2026 Réception /stockage BDD état PAV
 
 // éléments de la table config à communiquer
 typedef struct s_config {

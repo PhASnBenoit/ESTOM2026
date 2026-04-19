@@ -39,7 +39,11 @@ void CApp::on_configUpdated(T_CONFIG cfg)
         for (const QString &ip : ipList) {
             switch (_currentEtat) {
             case 0: // attente départ partie
-                sendMsgTCP(ip, 0, toSend);
+                if (_dbReader->checkPAV(ip)==true)
+                    toSend.pb = "P";
+                else
+                    toSend.pb = "B";
+                sendMsgTCP(ip, 0, toSend);  // Attention, INIT différentselon PAV et BOM
                 qDebug() << "Ordre 0, initialisation....";
                 break;
             case 1: // départ partie
@@ -62,12 +66,13 @@ void CApp::on_configUpdated(T_CONFIG cfg)
 } // method
 
 // Appelé lors de la réception d'un état d'un périphérique
+// réponse  lorsque c'est nécessaire
 void CApp::on_infoUpdated(T_INFOS infos, QString ip)
 {
     qDebug() << "<=====|MAJ-INFO-" << ip <<"|=====>";
 
     T_SEND toSend;
-    toSend.etatJ = QString::number(_currentEtat);
+//    toSend.etatJ = QString::number(_currentEtat);
     // états des périphériques BOM ou PAV
     if (infos.type == "BOM") {
         toSend.pb = "B";
@@ -75,7 +80,6 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
         case 0: //BONJOUR
             qDebug() << "BONJOUR de BOM (" << ip << ")";
             _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.couleur});
-            // toSend uniquement pb, le reste dans CApp
             sendMsgTCP(ip, 0, toSend); // Message INIT
             break;
         case 1: //EMPTYING
@@ -110,13 +114,32 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
 
     if (infos.type == "PAV") {
         toSend.pb = "P";
-        // une seule trame possible
-        if (infos.status.toInt() == 0) {  // BONJOUR
+        switch (infos.status.toInt()) {
+        case 0: // BONJOUR
+            qDebug() << "BONJOUR de PAV (" << ip << ")";
             _dbReader->insertDB("PAV", QVariantList{ip, infos.status, infos.couleur});
-            sendMsgTCP(ip, 0, toSend);
-        } else
+            sendMsgTCP(ip, 0, toSend); // envoi de INIT
+            break;
+        case 20:  // PAV VIDE
+            _dbReader->insertDB("PAV", QVariantList{ip, infos.status});
+            break;
+        case 21: // PAV PLEIN
+            _dbReader->insertDB("PAV", QVariantList{ip, infos.status});
+            break;
+        case 22: // PAV VIDAGE
+            _dbReader->insertDB("PAV", QVariantList{ip, infos.status});
+            break;
+        default:
             qDebug() << "Status BOM inconnu :" << infos.status;
+        } // sw
     } // if PAV
+}
+
+
+void CApp::sendMsgTCP(const QString &ip, int ordre, T_SEND toSend)
+{
+    toSend = _dbReader->getDatasToSend(ip, ordre, toSend);
+    emit sig_sendTcpMessage(ip, ordre, toSend);
 }
 
 void CApp::init() {
@@ -148,10 +171,4 @@ void CApp::init() {
 
     _connectChecker = new CConnectChecker(_dbReader);
     _connectChecker->start();
-}
-
-void CApp::sendMsgTCP(const QString &ip, int ordre, T_SEND toSend)
-{
-    toSend = _dbReader->getDatasToSend(ip, ordre, toSend);
-    emit sig_sendTcpMessage(ip, ordre, toSend);
 }

@@ -25,7 +25,7 @@ void CTcpSender::on_sendTcpMessage(const QString &ip, int ordre, T_SEND toSend)
             jsonObj["collisions"] = toSend.collisions;
             jsonObj["leds"] = toSend.leds;
         } else {
-            jsonObj["etat"] = toSend.etatP;
+            jsonObj["etatPAV"] = toSend.etatP;
             jsonObj["etatJeu"] = toSend.etatJ;
         } // else
         break;

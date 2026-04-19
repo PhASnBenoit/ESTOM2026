@@ -16,8 +16,8 @@ class CDatabase : public QThread
 public:
     explicit CDatabase(QObject *parent = nullptr);
     ~CDatabase();
-    bool insertDB(const QString &table, const QVariantList values);
-    bool checkPAV(const QString &ipPAV);
+    bool insertDB(const QString &table, const QVariantList valuesBP);
+    bool checkPAV(const QString &ip);
     QStringList getAllIPs();
     T_SEND getDatasToSend(QString ip, int ordre, T_SEND toSend);
 
