@@ -72,13 +72,11 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
     qDebug() << "<=====|MAJ-INFO-" << ip <<"|=====>";
 
     T_SEND toSend;
-//    toSend.etatJ = QString::number(_currentEtat);
-    // états des périphériques BOM ou PAV
-    if (infos.type == "BOM") {
+    if ( (infos.type=="BOM") || (infos.type=="BUS") ){
         toSend.pb = "B";
         switch (infos.status.toInt()) {
         case 0: //BONJOUR
-            qDebug() << "BONJOUR de BOM (" << ip << ")";
+            qDebug() << "BONJOUR de " << infos.type << " (" << ip << ")";
             _dbReader->insertDB("BOM", QVariantList{ip, infos.status, infos.couleur});
             sendMsgTCP(ip, 0, toSend); // Message INIT
             break;
@@ -112,7 +110,7 @@ void CApp::on_infoUpdated(T_INFOS infos, QString ip)
         } // sw
     } // if BOM
 
-    if (infos.type == "PAV") {
+    if ( (infos.type=="PAV") || (infos.type=="ABB") ) {
         toSend.pb = "P";
         switch (infos.status.toInt()) {
         case 0: // BONJOUR

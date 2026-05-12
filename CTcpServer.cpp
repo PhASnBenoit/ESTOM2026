@@ -66,33 +66,35 @@ void CTcpServer::incomingConnection(qintptr socketDescriptor) {
                 infos.status = jsonObj.value("status").toString();
 
                 switch(infos.status.toInt()) {
-                case 0: // BOM ou PAV annonce BONJOUR
+                case 0: // BOM/PAV/BUS/ABB annonce BONJOUR
                     infos.type = jsonObj.value("type").toString();
                     infos.couleur = jsonObj.value("couleur").toString();
+                    if (infos.type == "BUS")  infos.couleur = "40";
+                    if (infos.type == "ABB")  infos.couleur = "40";
                     break;
-                case 1: // BOM annonce DEB TRANSFER
+                case 1: // BOM/BUS annonce DEB TRANSFER
                     infos.type = "BOM";
                     infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
                     break;
-                case 2: // BOM annonce FIN TRANSFER
-                case 3: // BOM annonce ANN TRANSFER
+                case 2: // BOM/Bus annonce FIN TRANSFER
+                case 3: // BOM/Bus annonce ANN TRANSFER
                     infos.type = "BOM";
                     infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
                     infos.leds = jsonObj.value("leds").toString();
                     break;
-                case 4: // BOM annonce CHOCS
+                case 4: // BOM/Bus annonce CHOCS
                     infos.type = "BOM";
                     infos.collisions = jsonObj.value("collisions").toString();
                     break;
-                case 20: // PAV VIDE
+                case 20: // PAV/ABB VIDE
                     infos.type = "PAV";
                     infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
                     break;
-                case 21: // PAV PLEIN
+                case 21: // PAV/ABB PLEIN
                     infos.type = "PAV";
                     infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
                      break;
-                case 22: // PAV VIDAGE
+                case 22: // PAV/ABB VIDAGE
                     infos.type = "PAV";
                     infos.ipPAV = QString(PREFIXE_IP)+jsonObj.value("ipPAV").toString();
                      break;
