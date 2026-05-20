@@ -52,9 +52,8 @@ void CConnectChecker::run()
 
 bool CConnectChecker::pingIP(const QString &ip) {
     QProcess process;
-    QString command = QString("ping -c 1 -W 1 %1").arg(ip);  // Teste une seule fois avec un timeout de 1s
-    process.start(command);
-    process.waitForFinished(2000);  // Timeout général de 2s
+    process.start("ping", QStringList() << "-c" << "1" << "-W" << "1" << ip);
+    process.waitForFinished(1000);  // Timeout général de 2s
     return process.exitCode() == 0; // Retourne true si l'IP répond au ping
 }
 

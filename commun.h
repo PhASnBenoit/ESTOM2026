@@ -13,8 +13,8 @@
 //#define VERSION 2.7 // 16/04/2026 Ajout trame JSON de débug
 //#define VERSION 2.8 // 17/04/2026 Initialisation
 //#define VERSION 2.9 // 19/04/2026 Réception /stockage BDD état PAV
-#define VERSION 3.0 // 07/05/2026 Distinction Bom/Bus ABB/PAV
-
+//#define VERSION 3.0 // 07/05/2026 Distinction Bom/Bus ABB/PAV
+#define VERSION 3.1 // 20/05/2026 v3.1 Corr ping des IP
 
 // éléments de la table config à communiquer
 typedef struct s_config {
